@@ -10,13 +10,26 @@ const remove = async (req, res) => {
     }
 
     try {
-        // Find and delete the user by ID in one operation
-        const deletedUser = await User.findByIdAndDelete(userId);
+        // Find the user to be deleted
+        const userToDelete = await User.findById(userId);
 
-        // Check if the user exists and was deleted
-        if (!deletedUser) {
+        if (!userToDelete) {
             return res.status(404).json({ message: `User with ID ${userId} not found` });
         }
+
+        // Check if the user to delete is an admin
+        if (userToDelete.role === 'admin') {
+            // Count the number of admins in the system
+            const adminsCount = await User.countDocuments({ role: 'admin' });
+
+            // If there's only one admin, prevent the deletion
+            if (adminsCount <= 1) {
+                return res.status(400).json({ message: 'Cannot delete the last admin. At least one admin must exist.' });
+            }
+        }
+
+        // Proceed with the deletion of the user
+        await User.findByIdAndDelete(userId);
 
         // Send response after successful removal
         return res.status(204).send(); // 204 No Content is appropriate for a successful deletion

@@ -5,9 +5,7 @@ const getAllUser = async (req, res) => {
     const { id } = req.query;  // Retrieve the 'id' from query parameters
     
     try {
-     
         if (id) {
-            
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ message: 'Invalid user ID' });
             }
@@ -21,17 +19,15 @@ const getAllUser = async (req, res) => {
             // Return the found user
             return res.status(200).json(findSingleUser);
         } else {
-
-          
-            const users = await User.find(); // Directly awaiting the result
-
+            // Fetch all users and sort by 'date' in descending order (latest first)
+            const users = await User.find().sort({ date: -1 });  // Sort by date in descending order
 
             if (users.length === 0) {
                 return res.status(404).json({ message: 'No users found' });
             }
 
             // Return the list of users
-            return res.status(200).json({users});
+            return res.status(200).json({ users });
         }
 
     } catch (err) {

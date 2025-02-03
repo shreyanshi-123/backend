@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
     car: {
         type: [String],
         required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'user'],  // Only 'admin' or 'user' can be stored
+        default: 'user'  // Default role is 'user'
     }
 
 })
@@ -40,6 +45,7 @@ function validateUser(user) {
         email: Joi.string().min(5).max(255).required().email(),
         password: Joi.string().min(8).max(100).required(),
         car: Joi.array().items(Joi.string()).required(),
+        role: Joi.string().valid('admin', 'user').optional(),
         date: Joi.date().optional()
     })
     return schema.validate(user)
