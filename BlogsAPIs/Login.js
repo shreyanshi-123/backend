@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
 const bcrypt = require('bcryptjs');
-
+require('dotenv').config();
 const SignIn = async (req, res) => {
   const { email, password } = req.body;
 
@@ -12,10 +12,6 @@ const SignIn = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Debugging - check password
-    console.log('password entered:', password);
-    console.log('stored hashed password:', user.password);
-
     // Ensure password is not empty
     if (!password || password.trim() === '') {
       return res.status(400).json({ message: 'Password cannot be empty' });
@@ -23,21 +19,19 @@ const SignIn = async (req, res) => {
 
     // Compare entered password with stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(isPasswordValid);
     if (!isPasswordValid) {
-      
       return res.status(400).json({ message: 'Invalid email or password' });
     }
-
+    console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY);
     // Create and sign JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET_KEY,
       { expiresIn: '1h' }
     );
-    console.log(token);
+
     // Send back user data and token
-    res.json({
+    return res.json({
       token,
       user: {
         id: user._id,
