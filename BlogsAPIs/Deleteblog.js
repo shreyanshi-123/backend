@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const RemoveBlog = async (req, res) => {
     const blog_id = req.params.id;
-    console.log(blog_id);
+    // console.log(blog_id);
 
     // Check if the blog ID is provided and is a valid MongoDB ObjectId
     if (!blog_id || !mongoose.Types.ObjectId.isValid(blog_id)) {
